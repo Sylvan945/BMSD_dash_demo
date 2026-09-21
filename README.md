@@ -1,4 +1,4 @@
-# BUSINESS MANAGEMENT SOFTWARE DESIGN dash demo
+# BUSINESS MANAGEMENT SOFTWARE DESIGN
 # 台灣餐廳資料探索 Demo
 
 此 Demo 直接讀取 `datasets/RestaurantList.json`，提供：
