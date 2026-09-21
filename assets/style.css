@@ -1,0 +1,384 @@
+/* --------------------------------------------------------------------------
+   全域主題：使用清楚的深藍、青綠與灰階，讓資料區塊容易辨識。
+   -------------------------------------------------------------------------- */
+:root {
+  --ink: #172033;
+  --muted: #64748b;
+  --line: #dbe3ee;
+  --surface: #ffffff;
+  --canvas: #f3f6fa;
+  --primary: #1d4ed8;
+  --primary-dark: #172554;
+  --accent: #0f766e;
+  font-family: Inter, "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+  color: var(--ink);
+  background: var(--canvas);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--canvas);
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+/* --------------------------------------------------------------------------
+   外框與頁首：限制閱讀寬度，同時讓標題和資料時間保持清楚層級。
+   -------------------------------------------------------------------------- */
+.app-shell {
+  min-height: 100vh;
+}
+
+.page-header,
+main,
+footer {
+  width: min(1480px, calc(100% - 40px));
+  margin-inline: auto;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 24px;
+  padding: 34px 0 22px;
+}
+
+.eyebrow {
+  margin: 0 0 5px;
+  color: var(--primary);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin-top: 0;
+}
+
+h1 {
+  margin-bottom: 4px;
+  font-size: clamp(2rem, 4vw, 3.4rem);
+  line-height: 1.08;
+  letter-spacing: -0.04em;
+}
+
+.subtitle {
+  margin-bottom: 0;
+  color: var(--muted);
+}
+
+.data-time {
+  display: grid;
+  gap: 3px;
+  min-width: 230px;
+  padding: 12px 16px;
+  border-left: 4px solid var(--accent);
+  background: var(--surface);
+  box-shadow: 0 8px 24px rgb(15 23 42 / 7%);
+}
+
+.data-time span {
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+/* --------------------------------------------------------------------------
+   搜尋面板：桌機橫向排列，窄螢幕時自動改為單欄。
+   -------------------------------------------------------------------------- */
+.filter-panel {
+  display: grid;
+  grid-template-columns: minmax(280px, 1.7fr) repeat(2, minmax(170px, 1fr)) minmax(210px, 1fr) auto;
+  gap: 14px;
+  align-items: end;
+  padding: 20px;
+  border: 1px solid var(--line);
+  border-top: 4px solid var(--primary);
+  background: var(--surface);
+  box-shadow: 0 10px 30px rgb(15 23 42 / 6%);
+}
+
+.field {
+  min-width: 0;
+}
+
+.field label {
+  display: block;
+  margin-bottom: 7px;
+  font-size: 0.88rem;
+  font-weight: 750;
+}
+
+#keyword {
+  width: 100%;
+  height: 38px;
+  padding: 0 11px;
+  border: 1px solid #b8c5d6;
+  border-radius: 4px;
+  outline: none;
+}
+
+#keyword:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgb(37 99 235 / 15%);
+}
+
+.check-list {
+  display: flex;
+  flex-wrap: wrap;
+  min-height: 38px;
+  gap: 8px 14px;
+  align-items: center;
+}
+
+.check-list label {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  margin: 0;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.reset-button,
+.pagination button {
+  min-height: 38px;
+  padding: 0 15px;
+  border: 1px solid var(--primary-dark);
+  border-radius: 4px;
+  color: var(--primary-dark);
+  background: #fff;
+  cursor: pointer;
+}
+
+.reset-button:hover,
+.pagination button:hover:not(:disabled) {
+  color: #fff;
+  background: var(--primary-dark);
+}
+
+/* --------------------------------------------------------------------------
+   摘要與圖表：三張數字卡搭配排行榜、地圖兩個主要資料區塊。
+   -------------------------------------------------------------------------- */
+.metric-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin: 16px 0;
+}
+
+.metric-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 16px 18px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+}
+
+.metric-card strong {
+  color: var(--primary-dark);
+  font-size: clamp(1.5rem, 3vw, 2.2rem);
+}
+
+.metric-label {
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.visual-grid {
+  display: grid;
+  grid-template-columns: minmax(370px, 0.8fr) minmax(520px, 1.35fr);
+  gap: 16px;
+}
+
+.panel {
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  box-shadow: 0 8px 24px rgb(15 23 42 / 5%);
+}
+
+.section-heading {
+  padding: 18px 20px 0;
+}
+
+.section-heading h2 {
+  margin-bottom: 3px;
+  font-size: 1.18rem;
+}
+
+.section-heading p {
+  margin-bottom: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+/* --------------------------------------------------------------------------
+   搜尋結果：卡片保持資訊密度，同時標出營業狀態與外部連結。
+   -------------------------------------------------------------------------- */
+.results-panel {
+  margin-top: 16px;
+  padding-bottom: 20px;
+}
+
+.result-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--line);
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  white-space: nowrap;
+}
+
+.pagination button:disabled {
+  opacity: 0.42;
+  cursor: not-allowed;
+}
+
+.result-list {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  padding: 18px 20px 0;
+}
+
+.result-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 172px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--primary);
+  background: #fff;
+}
+
+.result-title {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.result-title h3 {
+  margin-bottom: 12px;
+  font-size: 1.02rem;
+}
+
+.status {
+  flex: 0 0 auto;
+  padding: 3px 7px;
+  border-radius: 999px;
+  font-size: 0.74rem;
+  font-weight: 750;
+}
+
+.status.open {
+  color: #065f46;
+  background: #d1fae5;
+}
+
+.status.closed {
+  color: #991b1b;
+  background: #fee2e2;
+}
+
+.result-meta {
+  display: grid;
+  gap: 5px;
+  color: #475569;
+  font-size: 0.88rem;
+}
+
+.result-links {
+  margin-top: 14px;
+}
+
+.result-links a {
+  color: var(--primary);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.empty-state {
+  grid-column: 1 / -1;
+  padding: 44px;
+  color: var(--muted);
+  text-align: center;
+  background: #f8fafc;
+}
+
+footer {
+  padding: 22px 0 32px;
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+/* --------------------------------------------------------------------------
+   響應式規則：平板改成單欄圖表，手機再縮減卡片欄數與留白。
+   -------------------------------------------------------------------------- */
+@media (max-width: 1180px) {
+  .filter-panel {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .visual-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .result-list {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 720px) {
+  .page-header,
+  main,
+  footer {
+    width: min(100% - 24px, 1480px);
+  }
+
+  .page-header,
+  .result-heading {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .data-time {
+    min-width: 0;
+  }
+
+  .filter-panel,
+  .metric-grid,
+  .result-list {
+    grid-template-columns: 1fr;
+  }
+
+  .metric-card {
+    padding: 12px 15px;
+  }
+
+  .pagination {
+    justify-content: space-between;
+  }
+}
