@@ -96,6 +96,28 @@ h1 {
 }
 
 /* --------------------------------------------------------------------------
+   主分頁：清楚區隔整體資料分析與單一店家探索兩種使用情境。
+   -------------------------------------------------------------------------- */
+.view-tabs {
+  margin-bottom: 16px;
+}
+
+.view-tabs .tab {
+  min-height: 48px;
+  padding: 13px 20px !important;
+  border-color: var(--line) !important;
+  color: var(--muted);
+  background: #e9eef5 !important;
+  font-weight: 750;
+}
+
+.view-tabs .tab--selected {
+  border-top: 4px solid var(--primary) !important;
+  color: var(--primary-dark) !important;
+  background: var(--surface) !important;
+}
+
+/* --------------------------------------------------------------------------
    搜尋面板：桌機橫向排列，窄螢幕時自動改為單欄。
    -------------------------------------------------------------------------- */
 .filter-panel {
@@ -202,6 +224,11 @@ h1 {
   display: grid;
   grid-template-columns: minmax(370px, 0.8fr) minmax(520px, 1.35fr);
   gap: 16px;
+}
+
+/* 第一頁先比較縣市排行與菜色比例，再以完整寬度呈現全臺地圖。 */
+.overview-map-panel {
+  grid-column: 1 / -1;
 }
 
 .panel {
@@ -320,6 +347,259 @@ h1 {
   text-decoration: none;
 }
 
+/* --------------------------------------------------------------------------
+   店家探索：左側呈現完整資料，右側以大地圖聚焦單一店家。
+   -------------------------------------------------------------------------- */
+.explorer-toolbar {
+  margin-bottom: 16px;
+  padding: 20px;
+  border-top: 4px solid var(--primary);
+}
+
+.explorer-picker {
+  display: grid;
+  grid-template-columns: minmax(180px, 0.45fr) minmax(320px, 1.55fr);
+  gap: 14px;
+  max-width: 920px;
+}
+
+.explorer-picker label {
+  display: block;
+  margin-bottom: 7px;
+  font-weight: 750;
+}
+
+.picker-hint {
+  grid-column: 1 / -1;
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+
+.explorer-grid {
+  display: grid;
+  grid-template-columns: minmax(360px, 0.85fr) minmax(520px, 1.15fr);
+  gap: 16px;
+}
+
+.detail-panel {
+  min-height: 578px;
+}
+
+.detail-content {
+  padding: 24px;
+}
+
+.detail-header {
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--line);
+}
+
+.detail-location {
+  margin-bottom: 5px;
+  color: var(--primary);
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.detail-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.detail-title h2 {
+  margin-bottom: 0;
+  font-size: clamp(1.45rem, 3vw, 2.15rem);
+  line-height: 1.2;
+}
+
+.detail-fields {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1px;
+  margin: 20px 0;
+  border: 1px solid var(--line);
+  background: var(--line);
+}
+
+.detail-field {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+  padding: 13px 14px;
+  background: #f8fafc;
+}
+
+.detail-label {
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 750;
+}
+
+.detail-field strong {
+  overflow-wrap: anywhere;
+  font-size: 0.92rem;
+}
+
+.detail-description,
+.detail-social {
+  margin-top: 20px;
+}
+
+.detail-description h3,
+.detail-social h3 {
+  margin-bottom: 7px;
+  font-size: 0.95rem;
+}
+
+.detail-description p,
+.missing-data {
+  color: #475569;
+}
+
+.detail-description p {
+  max-height: 145px;
+  margin-bottom: 0;
+  overflow-y: auto;
+}
+
+.detail-links,
+.detail-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+}
+
+.detail-actions {
+  margin-top: 22px;
+}
+
+.detail-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 38px;
+  padding: 7px 13px;
+  border: 1px solid var(--primary);
+  border-radius: 4px;
+  color: #fff;
+  background: var(--primary);
+  font-size: 0.88rem;
+  font-weight: 750;
+  text-decoration: none;
+}
+
+.detail-link:hover {
+  background: var(--primary-dark);
+}
+
+.secondary-link,
+.social-link {
+  color: var(--primary-dark);
+  background: #fff;
+}
+
+/* --------------------------------------------------------------------------
+   餐廳規劃：時間 Slider 與條件選單並排，結果以地圖加清單呈現。
+   -------------------------------------------------------------------------- */
+.planner-toolbar {
+  padding: 22px;
+  border-top: 4px solid var(--accent);
+}
+
+.planner-controls {
+  display: grid;
+  grid-template-columns: minmax(360px, 1.45fr) minmax(180px, 0.65fr) minmax(300px, 1fr);
+  gap: 22px;
+  align-items: start;
+}
+
+.slider-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 10px;
+}
+
+.slider-heading label {
+  font-weight: 750;
+}
+
+.slider-heading strong {
+  color: var(--accent);
+  font-size: 1.25rem;
+}
+
+.planner-slider {
+  min-width: 0;
+}
+
+.planner-hint {
+  margin: 10px 0 0;
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+.planner-results-panel {
+  margin-top: 16px;
+  padding-bottom: 20px;
+}
+
+.planner-output-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  padding: 16px 20px 0;
+}
+
+.planner-map-wrap {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--line);
+}
+
+.planner-results {
+  /* 全部店家改為自動換行網格，不再限制高度或使用內部捲軸。 */
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  padding: 0 20px;
+}
+
+.planner-results .result-card {
+  min-height: 172px;
+}
+
+.planner-results .empty-state {
+  grid-column: 1 / -1;
+}
+
+.planner-list-heading {
+  padding: 22px 20px 12px;
+}
+
+.planner-list-heading h3 {
+  margin-bottom: 3px;
+  font-size: 1rem;
+}
+
+.planner-list-heading p {
+  margin-bottom: 0;
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+.planner-more {
+  margin: 0;
+  padding: 12px;
+  color: var(--muted);
+  text-align: center;
+  background: #f8fafc;
+  font-size: 0.85rem;
+}
+
 .empty-state {
   grid-column: 1 / -1;
   padding: 44px;
@@ -342,8 +622,22 @@ footer {
     grid-template-columns: repeat(3, 1fr);
   }
 
-  .visual-grid {
+  .visual-grid,
+  .explorer-grid,
+  .planner-output-grid {
     grid-template-columns: 1fr;
+  }
+
+  .planner-controls {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .planner-results {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .planner-slider {
+    grid-column: 1 / -1;
   }
 
   .result-list {
@@ -370,8 +664,28 @@ footer {
 
   .filter-panel,
   .metric-grid,
-  .result-list {
+  .result-list,
+  .detail-fields,
+  .explorer-picker,
+  .planner-controls {
     grid-template-columns: 1fr;
+  }
+
+  .planner-slider {
+    grid-column: auto;
+  }
+
+  .planner-output-grid {
+    padding-inline: 12px;
+  }
+
+  .planner-results {
+    grid-template-columns: 1fr;
+    padding-inline: 12px;
+  }
+
+  .picker-hint {
+    grid-column: auto;
   }
 
   .metric-card {
