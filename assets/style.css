@@ -354,6 +354,10 @@ h1 {
   margin-bottom: 16px;
   padding: 20px;
   border-top: 4px solid var(--primary);
+  /* Dropdown 選單需要浮出工具列，不能被通用 panel 的 overflow 裁切。 */
+  position: relative;
+  z-index: 30;
+  overflow: visible;
 }
 
 .explorer-picker {
@@ -507,6 +511,34 @@ h1 {
 .planner-toolbar {
   padding: 22px;
   border-top: 4px solid var(--accent);
+  /* 多選菜色選單同樣允許浮出工具列，避免下方結果區塊蓋住選項。 */
+  position: relative;
+  z-index: 30;
+  overflow: visible;
+}
+
+/* Dash Dropdown 使用 React Select；提高選單層級並限制高度，讓內部可捲到底。 */
+.explorer-toolbar .Select-menu-outer,
+.planner-toolbar .Select-menu-outer,
+.filter-panel .Select-menu-outer {
+  z-index: 1000 !important;
+  max-height: 320px !important;
+  overflow: hidden;
+}
+
+.explorer-toolbar .Select-menu,
+.planner-toolbar .Select-menu,
+.filter-panel .Select-menu {
+  max-height: 318px !important;
+  overflow-y: auto !important;
+  overscroll-behavior: contain;
+}
+
+/* 搜尋面板也可能展開縣市選單，因此建立相同的浮動層級。 */
+.filter-panel {
+  position: relative;
+  z-index: 30;
+  overflow: visible;
 }
 
 .planner-controls {
