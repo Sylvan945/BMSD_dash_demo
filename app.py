@@ -17,7 +17,7 @@ from urllib.parse import urlparse
 
 import pandas as pd
 import plotly.express as px
-from dash import Dash, Input, Output, State, callback, dcc, html, no_update
+from dash import ALL, Dash, Input, Output, State, callback, ctx, dcc, html, no_update
 
 
 # -----------------------------------------------------------------------------
@@ -250,14 +250,6 @@ def load_restaurants() -> tuple[pd.DataFrame, str]:
 RESTAURANTS, DATA_UPDATE_TIME = load_restaurants()
 CITY_OPTIONS = sorted(RESTAURANTS["city"].dropna().unique().tolist())
 PLANNER_DEFAULT_CITY = CITY_OPTIONS[0] if CITY_OPTIONS else None
-RESTAURANT_OPTIONS = [
-    {
-        "label": f"{row['name']}｜{row['city']} {row['town']}",
-        "value": row["id"],
-    }
-    for _, row in RESTAURANTS.sort_values(["city", "town", "name"], kind="stable").iterrows()
-]
-DEFAULT_RESTAURANT_ID = RESTAURANT_OPTIONS[0]["value"] if RESTAURANT_OPTIONS else None
 AVAILABLE_CUISINE_CODES = sorted(
     {code for codes in RESTAURANTS["cuisine_codes"] for code in codes}
 )
@@ -446,8 +438,8 @@ def metric_card(label: str, element_id: str) -> html.Div:
     )
 
 
-def result_card(row: pd.Series) -> html.Article:
-    """將一筆餐廳資料轉為搜尋結果卡片。"""
+def result_card(row: pd.Series, show_detail_button: bool = False) -> html.Article:
+    """將一筆餐廳資料轉為結果卡片，規劃頁可額外加入詳細資料按鈕。"""
     detail_items = [
         html.Span(f"📍 {row['address'] or '地址未提供'}"),
         html.Span(f"☎ {row['telephone'] or '電話未提供'}"),
@@ -457,6 +449,15 @@ def result_card(row: pd.Series) -> html.Article:
     if row["website"]:
         links.append(
             html.A("官方網站", href=row["website"], target="_blank", rel="noreferrer")
+        )
+    if show_detail_button:
+        links.append(
+            html.Button(
+                "查看店家詳細資料",
+                id={"type": "planner-detail-button", "restaurant_id": row["id"]},
+                n_clicks=0,
+                className="detail-navigation-button",
+            )
         )
 
     return html.Article(
@@ -525,6 +526,8 @@ app.layout = html.Div(
                     ],
                     className="view-tabs",
                 ),
+                # 暫存第三頁選取的店家，供第二頁載入對應縣市與詳細資料。
+                dcc.Store(id="navigate-restaurant-store"),
                 html.Div(
                     [
                 html.Section(
@@ -687,20 +690,48 @@ app.layout = html.Div(
                                         ),
                                         html.Div(
                                             [
+                                                html.Label("店名／簡介關鍵字", htmlFor="explorer-keyword"),
+                                                dcc.Input(
+                                                    id="explorer-keyword",
+                                                    type="search",
+                                                    placeholder="例如：客家、海鮮、景觀",
+                                                    debounce=True,
+                                                    className="text-input",
+                                                ),
+                                            ],
+                                            className="field",
+                                        ),
+                                        html.Div(
+                                            [
+                                                html.Label("菜色類型（可複選）", htmlFor="explorer-cuisines"),
+                                                dcc.Dropdown(
+                                                    id="explorer-cuisines",
+                                                    options=CUISINE_OPTIONS,
+                                                    value=[],
+                                                    placeholder="全部類型",
+                                                    multi=True,
+                                                    clearable=True,
+                                                ),
+                                            ],
+                                            className="field",
+                                        ),
+                                        html.Div(
+                                            [
                                                 html.Label("選擇店家", htmlFor="restaurant-picker"),
                                                 dcc.Dropdown(
                                                     id="restaurant-picker",
-                                                    options=RESTAURANT_OPTIONS,
-                                                    value=DEFAULT_RESTAURANT_ID,
-                                                    placeholder="輸入店名搜尋",
+                                                    options=[],
+                                                    value=None,
+                                                    placeholder="請先使用搜尋條件",
                                                     clearable=False,
                                                     searchable=True,
+                                                    disabled=True,
                                                 ),
                                             ],
                                             className="field",
                                         ),
                                         html.P(
-                                            "先選縣市可縮小店家範圍；也可以直接輸入店名搜尋。",
+                                            "設定縣市、關鍵字或菜色類型後，才會載入符合條件的店家資料。",
                                             className="picker-hint",
                                         ),
                                     ],
@@ -737,6 +768,8 @@ app.layout = html.Div(
                                 ),
                             ],
                             className="explorer-grid",
+                            id="explorer-details",
+                            style={"display": "none"},
                         ),
                     ],
                     id="explorer-tab-content",
@@ -891,12 +924,46 @@ def switch_view(active_tab: str):
 @callback(
     Output("restaurant-picker", "options"),
     Output("restaurant-picker", "value"),
+    Output("restaurant-picker", "disabled"),
     Input("explorer-city", "value"),
+    Input("explorer-keyword", "value"),
+    Input("explorer-cuisines", "value"),
+    Input("navigate-restaurant-store", "data"),
     State("restaurant-picker", "value"),
 )
-def update_explorer_restaurants(city: str | None, current_id: str | None):
-    """依選定縣市更新店家清單，並盡量保留目前選取的店家。"""
-    filtered = RESTAURANTS if not city else RESTAURANTS[RESTAURANTS["city"] == city]
+def update_explorer_restaurants(
+    city: str | None,
+    keyword: str | None,
+    cuisine_codes: list[int] | None,
+    navigation_data: dict | None,
+    current_id: str | None,
+):
+    """依縣市、簡介關鍵字與菜色類型產生店家清單。"""
+    selected_codes = set(cuisine_codes or [])
+    has_search_condition = bool(city or (keyword and keyword.strip()) or selected_codes)
+
+    # 初始狀態不提供店家清單，使用者設定任一搜尋條件後才載入資料。
+    if not has_search_condition:
+        return [], None, True
+
+    filtered = RESTAURANTS.copy()
+    if city:
+        filtered = filtered[filtered["city"] == city]
+    if keyword and keyword.strip():
+        normalized_keyword = keyword.strip().lower()
+        filtered = filtered[
+            filtered["search_text"].str.contains(
+                normalized_keyword,
+                regex=False,
+                na=False,
+            )
+        ]
+    if selected_codes:
+        cuisine_mask = filtered["cuisine_codes"].map(
+            lambda codes: bool(selected_codes.intersection(codes))
+        ).astype(bool)
+        filtered = filtered.loc[cuisine_mask]
+
     options = [
         {
             "label": f"{row['name']}｜{row['town']}",
@@ -905,10 +972,50 @@ def update_explorer_restaurants(city: str | None, current_id: str | None):
         for _, row in filtered.sort_values(["town", "name"], kind="stable").iterrows()
     ]
 
-    # 若目前店家仍屬於選定縣市就保留，否則自動顯示新清單第一家。
+    # 從規劃頁跳轉時優先選取指定店家；一般切換縣市則盡量保留目前店家。
     valid_ids = {option["value"] for option in options}
-    selected_id = current_id if current_id in valid_ids else (options[0]["value"] if options else None)
-    return options, selected_id
+    requested_id = (navigation_data or {}).get("restaurant_id")
+    if requested_id in valid_ids:
+        selected_id = requested_id
+    elif current_id in valid_ids:
+        selected_id = current_id
+    else:
+        selected_id = options[0]["value"] if options else None
+    return options, selected_id, not bool(options)
+
+
+# -----------------------------------------------------------------------------
+# 規劃頁導覽回呼：點擊卡片按鈕後切換至店家探索並指定該店家。
+# -----------------------------------------------------------------------------
+@callback(
+    Output("view-tabs", "value"),
+    Output("explorer-city", "value"),
+    Output("explorer-keyword", "value"),
+    Output("explorer-cuisines", "value"),
+    Output("navigate-restaurant-store", "data"),
+    Input({"type": "planner-detail-button", "restaurant_id": ALL}, "n_clicks"),
+    prevent_initial_call=True,
+)
+def navigate_to_restaurant_detail(click_counts: list[int]):
+    """取得被點擊的店家 ID，並準備店家探索頁所需的導覽資料。"""
+    triggered = ctx.triggered_id
+    if not isinstance(triggered, dict) or not any(click_counts or []):
+        return no_update, no_update, no_update, no_update, no_update
+
+    restaurant_id = triggered.get("restaurant_id")
+    selected = RESTAURANTS[RESTAURANTS["id"] == restaurant_id]
+    if selected.empty:
+        return no_update, no_update, no_update, no_update, no_update
+
+    # 加入點擊次數，確保再次點擊同一家店時 Store 仍會產生新的導覽事件。
+    click_sequence = sum(click_counts or [])
+    return (
+        "explorer",
+        selected.iloc[0]["city"],
+        "",
+        [],
+        {"restaurant_id": restaurant_id, "click_sequence": click_sequence},
+    )
 
 
 # -----------------------------------------------------------------------------
@@ -917,21 +1024,24 @@ def update_explorer_restaurants(city: str | None, current_id: str | None):
 @callback(
     Output("restaurant-detail", "children"),
     Output("detail-map", "figure"),
+    Output("explorer-details", "style"),
     Input("restaurant-picker", "value"),
 )
 def update_restaurant_detail(restaurant_id: str | None):
     """依餐廳 ID 產生詳細資料區塊與聚焦地圖。"""
     selected = RESTAURANTS[RESTAURANTS["id"] == restaurant_id]
     if selected.empty:
+        # 初始狀態的詳細區塊會隱藏，因此只需提供安全的空圖表物件。
         empty_figure = px.scatter_map()
         empty_figure.update_layout(
-            map_style="open-street-map",
-            center={"lat": 23.75, "lon": 120.95},
-            zoom=6.2,
             margin=dict(l=0, r=0, t=0, b=0),
             height=500,
         )
-        return html.Div("請先選擇店家。", className="empty-state"), empty_figure
+        return (
+            html.Div("請先選擇店家。", className="empty-state"),
+            empty_figure,
+            {"display": "none"},
+        )
 
     row = selected.iloc[0]
 
@@ -1010,7 +1120,7 @@ def update_restaurant_detail(restaurant_id: str | None):
         ],
         className="detail-content",
     )
-    return detail, build_detail_map(row)
+    return detail, build_detail_map(row), {"display": "grid"}
 
 
 # -----------------------------------------------------------------------------
@@ -1088,7 +1198,10 @@ def update_planner(
 
     if result_count:
         # 使用者希望查看全部結果，因此不再截取前 12 筆或顯示剩餘筆數提示。
-        result_items = [result_card(row) for _, row in filtered.iterrows()]
+        result_items = [
+            result_card(row, show_detail_button=True)
+            for _, row in filtered.iterrows()
+        ]
     else:
         result_items = [
             html.Div(

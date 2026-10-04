@@ -143,7 +143,8 @@ h1 {
   font-weight: 750;
 }
 
-#keyword {
+#keyword,
+.text-input {
   width: 100%;
   height: 38px;
   padding: 0 11px;
@@ -152,7 +153,8 @@ h1 {
   outline: none;
 }
 
-#keyword:focus {
+#keyword:focus,
+.text-input:focus {
   border-color: var(--primary);
   box-shadow: 0 0 0 3px rgb(37 99 235 / 15%);
 }
@@ -338,6 +340,10 @@ h1 {
 }
 
 .result-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
   margin-top: 14px;
 }
 
@@ -345,6 +351,22 @@ h1 {
   color: var(--primary);
   font-weight: 700;
   text-decoration: none;
+}
+
+.detail-navigation-button {
+  min-height: 34px;
+  padding: 6px 11px;
+  border: 1px solid var(--primary);
+  border-radius: 4px;
+  color: #fff;
+  background: var(--primary);
+  font-size: 0.82rem;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.detail-navigation-button:hover {
+  background: var(--primary-dark);
 }
 
 /* --------------------------------------------------------------------------
@@ -362,9 +384,9 @@ h1 {
 
 .explorer-picker {
   display: grid;
-  grid-template-columns: minmax(180px, 0.45fr) minmax(320px, 1.55fr);
+  grid-template-columns: minmax(150px, 0.55fr) minmax(220px, 0.85fr) minmax(250px, 1fr) minmax(300px, 1.2fr);
   gap: 14px;
-  max-width: 920px;
+  max-width: none;
 }
 
 .explorer-picker label {
@@ -662,6 +684,10 @@ footer {
 
   .planner-controls {
     grid-template-columns: 1fr 1fr;
+  }
+
+  .explorer-picker {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .planner-results {
