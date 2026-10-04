@@ -1,6 +1,4 @@
-<<<<<<< HEAD
-# BMSD_dash_demo
-=======
+# BUSINESS MANAGEMENT SOFTWARE DESIGN
 # 台灣餐廳資料探索 Demo
 
 此 Demo 直接讀取 `datasets/RestaurantList.json`，提供：
@@ -21,4 +19,3 @@ python app.py
 ```
 
 啟動後，請開啟終端機顯示的本機網址（預設為 `http://127.0.0.1:8050`）。
->>>>>>> 4f087d3 (9/21 first submit)
