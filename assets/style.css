@@ -397,9 +397,14 @@ h1 {
 
 .picker-hint {
   grid-column: 1 / -1;
-  margin: 8px 0 0;
-  color: var(--muted);
-  font-size: 0.88rem;
+  margin: 10px 0 0;
+  padding: 12px 14px;
+  border-left: 4px solid var(--primary);
+  color: #334155;
+  background: #eff6ff;
+  font-size: 1.125rem;
+  font-weight: 650;
+  line-height: 1.7;
 }
 
 .explorer-grid {

@@ -731,7 +731,12 @@ app.layout = html.Div(
                                             className="field",
                                         ),
                                         html.P(
-                                            "設定縣市、關鍵字或菜色類型後，才會載入符合條件的店家資料。",
+                                            [
+                                                "設定縣市、關鍵字或菜色類型後，才會載入符合條件的店家資料。",
+                                                html.Br(),
+                                                "當前並未進行任何篩選，請使用者透過上方欄位搜尋即可開始瀏覽店家。",
+                                            ],
+                                            id="explorer-search-hint",
                                             className="picker-hint",
                                         ),
                                     ],
@@ -925,6 +930,7 @@ def switch_view(active_tab: str):
     Output("restaurant-picker", "options"),
     Output("restaurant-picker", "value"),
     Output("restaurant-picker", "disabled"),
+    Output("explorer-search-hint", "style"),
     Input("explorer-city", "value"),
     Input("explorer-keyword", "value"),
     Input("explorer-cuisines", "value"),
@@ -944,7 +950,7 @@ def update_explorer_restaurants(
 
     # 初始狀態不提供店家清單，使用者設定任一搜尋條件後才載入資料。
     if not has_search_condition:
-        return [], None, True
+        return [], None, True, {"display": "block"}
 
     filtered = RESTAURANTS.copy()
     if city:
@@ -981,7 +987,8 @@ def update_explorer_restaurants(
         selected_id = current_id
     else:
         selected_id = options[0]["value"] if options else None
-    return options, selected_id, not bool(options)
+    # 一旦使用者開始搜尋，就隱藏初始操作提示。
+    return options, selected_id, not bool(options), {"display": "none"}
 
 
 # -----------------------------------------------------------------------------
