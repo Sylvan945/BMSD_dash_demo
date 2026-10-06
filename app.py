@@ -739,6 +739,15 @@ app.layout = html.Div(
                                             id="explorer-search-hint",
                                             className="picker-hint",
                                         ),
+                                        html.Div(
+                                            [
+                                                html.Strong("查不到符合條件的店家"),
+                                                html.P("請調整縣市、關鍵字或菜色類型後再試一次。"),
+                                            ],
+                                            id="explorer-no-results",
+                                            className="explorer-no-results",
+                                            style={"display": "none"},
+                                        ),
                                     ],
                                     className="explorer-picker",
                                 )
@@ -931,6 +940,7 @@ def switch_view(active_tab: str):
     Output("restaurant-picker", "value"),
     Output("restaurant-picker", "disabled"),
     Output("explorer-search-hint", "style"),
+    Output("explorer-no-results", "style"),
     Input("explorer-city", "value"),
     Input("explorer-keyword", "value"),
     Input("explorer-cuisines", "value"),
@@ -950,7 +960,7 @@ def update_explorer_restaurants(
 
     # 初始狀態不提供店家清單，使用者設定任一搜尋條件後才載入資料。
     if not has_search_condition:
-        return [], None, True, {"display": "block"}
+        return [], None, True, {"display": "block"}, {"display": "none"}
 
     filtered = RESTAURANTS.copy()
     if city:
@@ -987,8 +997,9 @@ def update_explorer_restaurants(
         selected_id = current_id
     else:
         selected_id = options[0]["value"] if options else None
-    # 一旦使用者開始搜尋，就隱藏初始操作提示。
-    return options, selected_id, not bool(options), {"display": "none"}
+    # 一旦使用者開始搜尋就隱藏初始提示；沒有結果時顯示查無店家訊息。
+    no_results_style = {"display": "block"} if not options else {"display": "none"}
+    return options, selected_id, not bool(options), {"display": "none"}, no_results_style
 
 
 # -----------------------------------------------------------------------------
