@@ -39,13 +39,3 @@ python app.py
 | `restaurant_dashboard/callbacks/explorer.py` | 店家探索的篩選選項、店家詳細資料、社群連結及單店地圖更新。 |
 | `restaurant_dashboard/callbacks/planner.py` | 依縣市、用餐時間及菜色條件規劃餐廳，產生摘要、地圖與全部結果卡片。 |
 | `restaurant_dashboard/callbacks/navigation.py` | 切換分頁顯示狀態，以及從規劃結果跳至指定店家的詳細資料。 |
-
-### 維護時應修改哪裡
-
-- 調整頁面排列與控制項：`layout.py`；調整共用卡片：`components.py`。
-- 調整搜尋或互動行為：對應的 `callbacks/` 檔案。
-- 調整圖表呈現：`figures.py`；調整資料整理：`data.py`。
-- 調整營業時間判斷：`time_utils.py`；調整資料路徑或分頁筆數：`config.py`。
-- 樣式仍放在 `assets/`，原始資料仍放在 `datasets/`。
-
-資料由 `data.py` 在首次匯入時載入一次，各分頁共用同一份資料。回呼透過 `register_callbacks(app)` 明確註冊到應用程式，避免依賴全域回呼註冊狀態。
