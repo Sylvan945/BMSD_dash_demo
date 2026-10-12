@@ -1,0 +1,8 @@
+
+# Local Python environment and bytecode
+.venv/
+__pycache__/
+*.py[cod]
+
+# Private presentation previews and validation
+.presentation-build/
